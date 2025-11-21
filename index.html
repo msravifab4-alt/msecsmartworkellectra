@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MSEC Smart Workspace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind custom config (optional) -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Poppins", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Google Font (Poppins) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* Simple ripple effect for buttons */
+      .ripple {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ripple::after {
+        content: "";
+        position: absolute;
+        border-radius: 9999px;
+        transform: scale(0);
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body
+    class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white font-sans flex items-center justify-center"
+  >
+    <!-- MAIN WRAPPER -->
+    <div class="w-full max-w-md px-4 py-8">
+      <!-- CARD -->
+      <div
+        class="bg-slate-900/80 backdrop-blur-md rounded-3xl shadow-2xl border border-slate-700/70 px-6 py-8 sm:px-8 sm:py-10 flex flex-col items-center gap-6"
+      >
+        <!-- LOGO CIRCLE -->
+        <div class="relative">
+          <div
+            class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-sky-400 shadow-lg flex items-center justify-center bg-gradient-to-br from-sky-500/20 to-slate-900 overflow-hidden"
+          >
+            <!-- Replace this IMG with your real logo URL -->
+            <img
+              src="https://res.cloudinary.com/dij2lqcim/image/upload/v1763748167/download_1_ren5k5.png"
+              alt=" Logo"
+              class="w-20 h-20 object-contain"
+              onerror="this.style.display='none'"
+            />
+            <!-- Fallback text if logo URL not set -->
+            <span
+              class="text-sm font-semibold tracking-wide text-sky-300"
+              id="logo-fallback"
+            >
+              
+            </span>
+          </div>
+        </div>
+
+        <!-- TEXT SECTION -->
+        <div class="text-center space-y-1">
+          <h1
+            class="text-2xl sm:text-3xl font-semibold tracking-[0.15em] uppercase"
+          >
+            MSEC
+            <span class="block text-sky-400">Smart Workspace</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-300 tracking-[0.25em] uppercase">
+            by <span class="font-medium text-sky-300">ELLECTRA</span>
+          </p>
+        </div>
+
+        <!-- IOT / BACKGROUND IMAGE AREA -->
+        <div
+          class="w-full rounded-2xl bg-gradient-to-tr from-sky-500/10 via-sky-400/10 to-indigo-500/10 border border-sky-500/30 shadow-inner overflow-hidden"
+        >
+          <!-- Replace this with your IoT theme image URL -->
+          <img
+            src="https://res.cloudinary.com/dij2lqcim/image/upload/v1763748281/download_4_yeugsc.jpg"
+            alt="IoT Smart Automation"
+            class="w-full h-40 object-cover sm:h-44"
+            onerror="this.style.display='none'"
+          />
+          <!-- Fallback illustration removed as per your latest code -->
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="w-full flex flex-col sm:flex-row gap-3 mt-2">
+          <!-- LOGIN BUTTON -->
+          <button
+            id="loginBtn"
+            class="ripple flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-full bg-sky-500 hover:bg-sky-400 active:bg-sky-600 transition-all duration-200 shadow-lg shadow-sky-500/40 text-sm font-medium tracking-wide"
+          >
+            Login
+          </button>
+
+          <!-- ADMIN BUTTON -->
+          <button
+            id="adminBtn"
+            class="ripple flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-full border border-sky-400/70 bg-slate-900/60 hover:bg-slate-800 active:bg-slate-900 transition-all duration-200 text-sm font-medium tracking-wide text-sky-200"
+          >
+            Admin
+          </button>
+        </div>
+
+        <!-- FOOTER TEXT -->
+        <p class="mt-2 text-[11px] text-slate-400 text-center">
+          MSEC Smart Workspace · IoT-based automation for labs, classrooms and
+          campus utilities.
+        </p>
+      </div>
+    </div>
+
+    <!-- Firebase SDKs (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.5/firebase-auth-compat.js"></script>
+
+    <!-- SIMPLE JS: RIPPLES + FIREBASE LOGIN -->
+    <script>
+      // -------------------------------
+      // Firebase Config (your project)
+      // -------------------------------
+      const firebaseConfig = {
+        apiKey: "AIzaSyAhOJaqUqGNm02GrNUNzOiBVIz7Q0UB4y4",
+        authDomain: "msecsmartworkspaceellectra.firebaseapp.com",
+        databaseURL: "https://msecsmartworkspaceellectra-default-rtdb.firebaseio.com",
+        projectId: "msecsmartworkspaceellectra",
+        storageBucket: "msecsmartworkspaceellectra.firebasestorage.app",
+        messagingSenderId: "959144311304",
+        appId: "1:959144311304:web:a9cd738daa8a800d2e2fbd",
+        measurementId: "G-F5E8N7084S",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      // Firebase Auth (Google Sign-In)
+      const auth = firebase.auth();
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: "select_account",
+      });
+
+      // Admin emails
+      const ADMIN_EMAILS = [
+        "msravifab4@gmail.com",
+        "msravifab5@gmail.com",
+      ];
+
+      // Google Sign-in + redirect logic
+      // isAdminLogin = true when "Admin" button is used
+      function handleGoogleLogin(isAdminLogin) {
+        auth
+          .signInWithPopup(provider)
+          .then((result) => {
+            const user = result.user;
+            const email = (user.email || "").toLowerCase();
+
+            if (isAdminLogin) {
+              // Admin button clicked
+              if (ADMIN_EMAILS.includes(email)) {
+                // Admin email -> admin dashboard
+                window.location.href = "admindashboard.html";
+              } else {
+                // Not admin -> show error, stay here (or send to dashboard if you want)
+                alert("You are not authorized as admin. Please use normal Login.");
+              }
+            } else {
+              // Normal Login button clicked
+              // Everyone (including admins) goes to normal dashboard
+              window.location.href = "dashboard.html";
+            }
+          })
+          .catch((error) => {
+            console.error("Login error:", error);
+            alert("Login failed: " + error.message);
+          });
+      }
+
+      // --------------------------
+      // UI: Logo handling
+      // --------------------------
+      // Remove fallback text if logo image loads
+      const logoImg = document.querySelector('img[alt=" Logo"]');
+      const logoFallback = document.getElementById("logo-fallback");
+      if (logoImg) {
+        logoImg.addEventListener("load", () => {
+          if (logoImg.naturalWidth > 0) {
+            if (logoFallback) logoFallback.style.display = "none";
+          }
+        });
+      }
+
+      // Ripple effect on buttons
+      document.querySelectorAll(".ripple").forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+          const rect = this.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+
+          const circle = document.createElement("span");
+          circle.style.width = circle.style.height = size + "px";
+          circle.style.left = x + "px";
+          circle.style.top = y + "px";
+          circle.style.position = "absolute";
+          circle.style.borderRadius = "9999px";
+          circle.style.background = "rgba(255,255,255,0.25)";
+          circle.style.transform = "scale(0)";
+          circle.style.opacity = "1";
+          circle.style.transition =
+            "transform 0.4s ease-out, opacity 0.4s ease-out";
+
+          this.appendChild(circle);
+
+          requestAnimationFrame(() => {
+            circle.style.transform = "scale(2.5)";
+            circle.style.opacity = "0";
+          });
+
+          setTimeout(() => circle.remove(), 450);
+        });
+      });
+
+      // --------------------------
+      // Button click handlers
+      // --------------------------
+      document.getElementById("loginBtn").addEventListener("click", () => {
+        handleGoogleLogin(false); // normal login (everyone -> dashboard.html)
+      });
+
+      document.getElementById("adminBtn").addEventListener("click", () => {
+        handleGoogleLogin(true); // admin login (only admin emails -> admindashboard.html)
+      });
+    </script>
+  </body>
+</html>

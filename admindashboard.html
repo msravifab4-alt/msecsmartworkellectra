@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MSEC Smart Workspace – Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind custom config (optional) -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Poppins", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Google Font (Poppins) -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      .ripple {
+        position: relative;
+        overflow: hidden;
+      }
+      .ripple::after {
+        content: "";
+        position: absolute;
+        border-radius: 9999px;
+        transform: scale(0);
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body
+    class="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white font-sans flex items-center justify-center"
+  >
+    <div class="w-full max-w-4xl px-4 py-8">
+      <div
+        class="bg-slate-900/80 backdrop-blur-md rounded-3xl shadow-2xl border border-slate-700/70 px-6 py-8 sm:px-10 sm:py-10 flex flex-col gap-6"
+      >
+        <!-- HEADER -->
+        <div class="flex items-center gap-4 justify-between flex-wrap">
+          <div class="flex items-center gap-4">
+            <div
+              class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-sky-400 shadow-lg flex items-center justify-center bg-gradient-to-br from-sky-500/20 to-slate-900 overflow-hidden"
+            >
+              <img
+                src="https://res.cloudinary.com/dij2lqcim/image/upload/v1763748167/download_1_ren5k5.png"
+                alt="Logo"
+                class="w-14 h-14 object-contain"
+                onerror="this.style.display='none'"
+              />
+              <span
+                class="text-sm font-semibold tracking-wide text-sky-300"
+                id="logo-fallback"
+              >
+                MSEC
+              </span>
+            </div>
+
+            <div class="space-y-1">
+              <h1
+                class="text-xl sm:text-2xl font-semibold tracking-[0.15em] uppercase"
+              >
+                MSEC
+                <span class="block text-sky-400">Smart Workspace</span>
+              </h1>
+              <p class="text-[11px] sm:text-xs text-slate-300 tracking-[0.25em] uppercase">
+                Admin Dashboard · by <span class="font-medium text-sky-300">ELLECTRA</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-end gap-1 text-xs sm:text-sm">
+            <span class="text-slate-300">
+              Logged in as:
+              <span id="adminEmail" class="text-sky-300 font-medium">...</span>
+            </span>
+            <button
+              id="logoutBtn"
+              class="text-[11px] sm:text-xs px-3 py-1 rounded-full border border-slate-600 hover:bg-slate-800 transition"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- MQTT CONFIG SECTION -->
+        <section
+          class="mt-2 rounded-2xl border border-slate-700 bg-slate-900/60 p-4 sm:p-5 space-y-3"
+        >
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-sm sm:text-base font-semibold text-sky-300">
+              MQTT Configuration
+            </h2>
+            <span class="text-[11px] text-slate-400">
+              Used by entire app (devices & dashboards)
+            </span>
+          </div>
+
+          <form id="mqttForm" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">Broker Host</label>
+              <input
+                id="mqttHost"
+                type="text"
+                class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+                value="gf000f09.ala.us-east-1.emqxsl.com"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">MQTT over TLS Port</label>
+              <input
+                id="mqttPort"
+                type="number"
+                class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+                value="8883"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">
+                WebSocket over TLS Port
+              </label>
+              <input
+                id="mqttWsPort"
+                type="number"
+                class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+                value="8084"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">API URL</label>
+              <input
+                id="mqttApiUrl"
+                type="text"
+                class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+                value="https://gf000f09.ala.us-east-1.emqxsl.com:8443/api/v5"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">MQTT Username</label>
+              <input
+                id="mqttUser"
+                type="text"
+                class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="Enter broker username"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">MQTT Password</label>
+              <input
+                id="mqttPass"
+                type="password"
+                class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="Enter broker password"
+              />
+            </div>
+
+            <div class="sm:col-span-2 flex items-center justify-between mt-1">
+              <span id="mqttStatus" class="text-[11px] text-slate-400"></span>
+              <button
+                type="submit"
+                class="ripple inline-flex items-center justify-center px-4 py-2 rounded-full bg-sky-500 hover:bg-sky-400 active:bg-sky-600 text-xs font-medium shadow-lg shadow-sky-500/40"
+              >
+                Save MQTT Config
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ROOM CREATION + LIST -->
+        <section
+          class="rounded-2xl border border-slate-700 bg-slate-900/60 p-4 sm:p-5 space-y-4"
+        >
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <h2 class="text-sm sm:text-base font-semibold text-sky-300">
+              Room / Cabin Setup
+            </h2>
+            <span class="text-[11px] text-slate-400">
+              Create EEE / ECE / CSE / AIDS / CIVIL / MECH rooms
+            </span>
+          </div>
+
+          <form
+            id="roomForm"
+            class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end"
+          >
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">Department</label>
+              <select
+                id="roomDept"
+                class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+              >
+                <option value="EEE">EEE</option>
+                <option value="ECE">ECE</option>
+                <option value="CSE">CSE</option>
+                <option value="AIDS">AIDS</option>
+                <option value="CIVIL">CIVIL</option>
+                <option value="MECH">MECH</option>
+              </select>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs text-slate-300 mb-1">
+                Room / Cabin Name
+              </label>
+              <input
+                id="roomName"
+                type="text"
+                class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="e.g., EEE HOD Cabin, ECE Lab 1"
+              />
+            </div>
+
+            <div class="sm:col-span-3 flex items-center justify-between">
+              <span id="roomStatus" class="text-[11px] text-slate-400"></span>
+              <button
+                type="submit"
+                class="ripple inline-flex items-center justify-center px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-xs font-medium shadow-lg shadow-emerald-500/30"
+              >
+                Create Room
+              </button>
+            </div>
+          </form>
+
+          <div
+            id="roomsList"
+            class="mt-2 space-y-3 max-h-[260px] overflow-y-auto pr-1"
+          >
+            <!-- Rooms appear here -->
+          </div>
+        </section>
+
+        <!-- CONTROL ACCESS REQUESTS -->
+        <section
+          class="rounded-2xl border border-slate-700 bg-slate-900/60 p-4 sm:p-5 space-y-3"
+        >
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <h2 class="text-sm sm:text-base font-semibold text-sky-300">
+              Control Access Requests
+            </h2>
+            <span class="text-[11px] text-slate-400">
+              Users click "Get Permission" on dashboard. Approve to grant control.
+            </span>
+          </div>
+
+          <div
+            id="requestsList"
+            class="space-y-2 max-h-[220px] overflow-y-auto pr-1 text-[11px]"
+          >
+            <!-- Requests appear here -->
+          </div>
+        </section>
+
+        <p class="mt-1 text-[11px] text-slate-500 text-center">
+          This page is only for configuration and permission management. Device
+          ON/OFF control UI can be built separately for authorized users.
+        </p>
+      </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.5/firebase-database-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyAhOJaqUqGNm02GrNUNzOiBVIz7Q0UB4y4",
+        authDomain: "msecsmartworkspaceellectra.firebaseapp.com",
+        databaseURL: "https://msecsmartworkspaceellectra-default-rtdb.firebaseio.com",
+        projectId: "msecsmartworkspaceellectra",
+        storageBucket: "msecsmartworkspaceellectra.firebasestorage.app",
+        messagingSenderId: "959144311304",
+        appId: "1:959144311304:web:a9cd738daa8a800d2e2fbd",
+        measurementId: "G-F5E8N7084S",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.database();
+
+      const ADMIN_EMAILS = [
+        "msravifab4@gmail.com",
+        "msravifab5@gmail.com",
+      ];
+
+      const roomsList = document.getElementById("roomsList");
+      const requestsList = document.getElementById("requestsList");
+
+      // Admin protection
+      auth.onAuthStateChanged((user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
+        const email = (user.email || "").toLowerCase();
+        if (!ADMIN_EMAILS.includes(email)) {
+          window.location.href = "dashboard.html";
+          return;
+        }
+
+        const adminEmailSpan = document.getElementById("adminEmail");
+        if (adminEmailSpan) adminEmailSpan.textContent = email;
+
+        loadMqttConfig();
+        subscribeRooms();
+        subscribeRequests();
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        auth.signOut().then(() => {
+          window.location.href = "index.html";
+        });
+      });
+
+      // MQTT CONFIG
+      const mqttForm = document.getElementById("mqttForm");
+      const mqttStatus = document.getElementById("mqttStatus");
+
+      function loadMqttConfig() {
+        db.ref("config/mqtt").once("value", (snap) => {
+          const cfg = snap.val();
+          if (!cfg) return;
+          document.getElementById("mqttHost").value = cfg.host || "";
+          document.getElementById("mqttPort").value = cfg.tlsPort || "";
+          document.getElementById("mqttWsPort").value = cfg.wsPort || "";
+          document.getElementById("mqttApiUrl").value = cfg.apiUrl || "";
+          document.getElementById("mqttUser").value = cfg.username || "";
+          document.getElementById("mqttPass").value = cfg.password || "";
+        });
+      }
+
+      mqttForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const host = document.getElementById("mqttHost").value.trim();
+        const tlsPort = parseInt(document.getElementById("mqttPort").value, 10);
+        const wsPort = parseInt(document.getElementById("mqttWsPort").value, 10);
+        const apiUrl = document.getElementById("mqttApiUrl").value.trim();
+        const username = document.getElementById("mqttUser").value.trim();
+        const password = document.getElementById("mqttPass").value;
+
+        db.ref("config/mqtt")
+          .set({
+            host,
+            tlsPort,
+            wsPort,
+            apiUrl,
+            username,
+            password,
+            updatedAt: Date.now(),
+          })
+          .then(() => {
+            mqttStatus.textContent = "MQTT configuration saved.";
+            setTimeout(() => (mqttStatus.textContent = ""), 2500);
+          })
+          .catch((err) => {
+            console.error(err);
+            mqttStatus.textContent = "Error saving MQTT configuration.";
+          });
+      });
+
+      // ROOMS
+      const roomForm = document.getElementById("roomForm");
+      const roomStatus = document.getElementById("roomStatus");
+
+      roomForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const dept = document.getElementById("roomDept").value.trim();
+        const name = document.getElementById("roomName").value.trim();
+        if (!name) {
+          roomStatus.textContent = "Please enter a room / cabin name.";
+          return;
+        }
+        const roomsRef = db.ref("rooms");
+        const newRoomRef = roomsRef.push();
+        newRoomRef
+          .set({
+            dept,
+            name,
+            createdAt: Date.now(),
+          })
+          .then(() => {
+            roomStatus.textContent = "Room created.";
+            document.getElementById("roomName").value = "";
+            setTimeout(() => (roomStatus.textContent = ""), 2000);
+          })
+          .catch((err) => {
+            console.error(err);
+            roomStatus.textContent = "Error creating room.";
+          });
+      });
+
+      function subscribeRooms() {
+        db.ref("rooms").on("value", (snapshot) => {
+          roomsList.innerHTML = "";
+          if (!snapshot.exists()) {
+            roomsList.innerHTML =
+              '<p class="text-[11px] text-slate-400">No rooms created yet.</p>';
+            return;
+          }
+
+          snapshot.forEach((childSnap) => {
+            const roomId = childSnap.key;
+            const room = childSnap.val();
+            const dept = room.dept || "";
+            const name = room.name || "";
+
+            const deptBadge =
+              dept === "EEE"
+                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                : "bg-sky-500/20 text-sky-300 border-sky-500/40";
+
+            const roomDiv = document.createElement("div");
+            roomDiv.className =
+              "room-card rounded-2xl border border-slate-700 bg-slate-900/80 p-3 sm:p-4";
+            roomDiv.dataset.roomId = roomId;
+            roomDiv.dataset.roomDept = dept;
+            roomDiv.dataset.roomName = name;
+
+            roomDiv.innerHTML = `
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs px-2 py-0.5 rounded-full border ${deptBadge}">
+                      ${dept}
+                    </span>
+                    <span class="text-xs text-slate-400">
+                      Room ID: <span class="text-slate-300">${roomId.slice(-6)}</span>
+                    </span>
+                  </div>
+                  <h3 class="mt-1 text-sm font-medium text-slate-100">
+                    ${name}
+                  </h3>
+                  <p class="mt-1 text-[11px] text-slate-400">
+                    MQTT topics for this department:
+                    <span class="block text-[11px] text-sky-300">
+                      Control: msec/${dept.toLowerCase()}/relay/control
+                    </span>
+                    <span class="block text-[11px] text-sky-300">
+                      Status: msec/${dept.toLowerCase()}/relay/status
+                    </span>
+                  </p>
+                </div>
+                <button
+                  class="configDevicesBtn text-[11px] px-3 py-1 rounded-full border border-slate-600 hover:bg-slate-800"
+                >
+                  Configure Devices
+                </button>
+              </div>
+
+              <div class="devices-panel hidden mt-3 rounded-xl bg-slate-950/60 border border-slate-700 p-3 space-y-3">
+                <form class="addDeviceForm grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+                  <div class="sm:col-span-2">
+                    <label class="block text-[11px] text-slate-300 mb-1">Device Name</label>
+                    <input
+                      name="deviceName"
+                      type="text"
+                      class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-2 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-sky-500"
+                      placeholder="e.g., Light 1, Fan 2"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] text-slate-300 mb-1">Type</label>
+                    <select
+                      name="deviceType"
+                      class="w-full rounded-xl bg-slate-800/80 border border-slate-600 px-2 py-1.5 text-[11px] focus:outline-none focus:ring-1 focus:ring-sky-500"
+                    >
+                      <option value="Light">Light</option>
+                      <option value="Fan">Fan</option>
+                      <option value="AC">AC</option>
+                      <option value="Socket">Socket</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div class="sm:col-span-3 flex justify-end">
+                    <button
+                      type="submit"
+                      class="ripple inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-sky-500 hover:bg-sky-400 text-[11px] font-medium"
+                    >
+                      Add Device
+                    </button>
+                  </div>
+                </form>
+
+                <div class="devicesList space-y-2 text-[11px] text-slate-200">
+                  <!-- devices will appear here -->
+                </div>
+              </div>
+            `;
+
+            roomsList.appendChild(roomDiv);
+          });
+        });
+      }
+
+      // Toggle and load devices
+      roomsList.addEventListener("click", (e) => {
+        const configBtn = e.target.closest(".configDevicesBtn");
+        if (configBtn) {
+          const roomCard = configBtn.closest(".room-card");
+          const panel = roomCard.querySelector(".devices-panel");
+          const roomId = roomCard.dataset.roomId;
+          const dept = roomCard.dataset.roomDept;
+          const name = roomCard.dataset.roomName;
+          const devicesListEl = roomCard.querySelector(".devicesList");
+          panel.classList.toggle("hidden");
+          if (!panel.classList.contains("hidden")) {
+            loadDevices(roomId, dept, name, devicesListEl);
+          }
+        }
+      });
+
+      roomsList.addEventListener("submit", (e) => {
+        if (e.target.classList.contains("addDeviceForm")) {
+          e.preventDefault();
+          const form = e.target;
+          const roomCard = form.closest(".room-card");
+          const roomId = roomCard.dataset.roomId;
+          const dept = roomCard.dataset.roomDept;
+          const roomName = roomCard.dataset.roomName;
+
+          const nameInput = form.querySelector('input[name="deviceName"]');
+          const typeSelect = form.querySelector('select[name="deviceType"]');
+          const deviceName = (nameInput.value || "").trim();
+          const deviceType = typeSelect.value;
+          if (!deviceName) {
+            alert("Please enter a device name.");
+            return;
+          }
+
+          const deptLower = (dept || "").toLowerCase();
+          const controlTopic = `msec/${deptLower}/relay/control`;
+          const statusTopic = `msec/${deptLower}/relay/status`;
+
+          const devicesRef = db.ref(`rooms/${roomId}/devices`);
+          const newDevRef = devicesRef.push();
+          newDevRef
+            .set({
+              name: deviceName,
+              type: deviceType,
+              dept,
+              roomName,
+              controlTopic,
+              statusTopic,
+              createdAt: Date.now(),
+            })
+            .then(() => {
+              nameInput.value = "";
+            })
+            .catch((err) => {
+              console.error(err);
+              alert("Error adding device.");
+            });
+        }
+      });
+
+      function loadDevices(roomId, dept, roomName, containerEl) {
+        db.ref(`rooms/${roomId}/devices`).on("value", (snap) => {
+          containerEl.innerHTML = "";
+          if (!snap.exists()) {
+            containerEl.innerHTML =
+              '<p class="text-[11px] text-slate-400">No devices added yet.</p>';
+            return;
+          }
+          snap.forEach((devSnap) => {
+            const dev = devSnap.val();
+            const div = document.createElement("div");
+            div.className =
+              "rounded-lg border border-slate-700 bg-slate-900/80 px-2 py-2";
+            div.innerHTML = `
+              <div class="flex items-center justify-between gap-2">
+                <div>
+                  <div class="text-[11px] font-medium text-slate-100">
+                    ${dev.name || "Device"}
+                    <span class="text-[10px] text-slate-400">(${dev.type || ""})</span>
+                  </div>
+                  <div class="mt-1 text-[10px] text-slate-400">
+                    Control: <span class="text-sky-300">${dev.controlTopic}</span>
+                  </div>
+                  <div class="text-[10px] text-slate-400">
+                    Status: <span class="text-sky-300">${dev.statusTopic}</span>
+                  </div>
+                </div>
+                <span class="text-[10px] text-slate-500">View only</span>
+              </div>
+            `;
+            containerEl.appendChild(div);
+          });
+        });
+      }
+
+      // CONTROL REQUESTS
+      function subscribeRequests() {
+        db.ref("controlRequests").on("value", (snap) => {
+          requestsList.innerHTML = "";
+          if (!snap.exists()) {
+            requestsList.innerHTML =
+              '<p class="text-[11px] text-slate-400">No permission requests.</p>';
+            return;
+          }
+
+          snap.forEach((reqSnap) => {
+            const id = reqSnap.key;
+            const r = reqSnap.val();
+            const status = (r.status || "pending").toLowerCase();
+            const created = new Date(r.createdAt || 0).toLocaleString();
+
+            const row = document.createElement("div");
+            row.className =
+              "rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2";
+            row.dataset.reqId = id;
+            row.dataset.uid = r.uid || "";
+            row.dataset.email = r.email || "";
+
+            let statusBadgeClass = "text-amber-300 border-amber-500/40";
+            if (status === "approved")
+              statusBadgeClass = "text-emerald-300 border-emerald-500/40";
+            if (status === "rejected")
+              statusBadgeClass = "text-rose-300 border-rose-500/40";
+
+            row.innerHTML = `
+              <div class="space-y-1 text-[11px]">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-medium text-slate-100">${r.email || "Unknown user"}</span>
+                  <span class="px-2 py-0.5 rounded-full border ${statusBadgeClass}">
+                    ${status.toUpperCase()}
+                  </span>
+                </div>
+                <div class="text-slate-400">
+                  UID: <span class="text-slate-300">${(r.uid || "").slice(-8)}</span>
+                  · Requested at: <span class="text-slate-300">${created}</span>
+                </div>
+              </div>
+              <div class="flex gap-2 justify-end text-[11px]">
+                <button
+                  class="approveBtn ripple px-3 py-1 rounded-full border border-emerald-500/60 text-emerald-300 hover:bg-emerald-500/10"
+                  ${status !== "pending" ? "disabled" : ""}
+                >
+                  Approve
+                </button>
+                <button
+                  class="rejectBtn ripple px-3 py-1 rounded-full border border-rose-500/60 text-rose-300 hover:bg-rose-500/10"
+                  ${status !== "pending" ? "disabled" : ""}
+                >
+                  Reject
+                </button>
+              </div>
+            `;
+            requestsList.appendChild(row);
+          });
+        });
+      }
+
+      requestsList.addEventListener("click", (e) => {
+        const approveBtn = e.target.closest(".approveBtn");
+        const rejectBtn = e.target.closest(".rejectBtn");
+        const row = e.target.closest("[data-req-id]");
+        if (!row) return;
+        const reqId = row.dataset.reqId;
+        const uid = row.dataset.uid;
+        const email = row.dataset.email;
+
+        auth.onAuthStateChanged((admin) => {
+          if (!admin) return;
+          const adminEmail = admin.email || "";
+
+          if (approveBtn) {
+            if (!uid) {
+              alert("Missing UID for this request.");
+              return;
+            }
+            const permRef = db.ref("userPermissions/" + uid);
+            const reqRef = db.ref("controlRequests/" + reqId);
+
+            permRef
+              .set({
+                canControl: true,
+                email: email,
+                grantedBy: adminEmail,
+                grantedAt: Date.now(),
+              })
+              .then(() => {
+                return reqRef.update({
+                  status: "approved",
+                  handledBy: adminEmail,
+                  handledAt: Date.now(),
+                });
+              })
+              .catch((err) => {
+                console.error(err);
+                alert("Failed to approve request.");
+              });
+          }
+
+          if (rejectBtn) {
+            const reqRef = db.ref("controlRequests/" + reqId);
+            reqRef
+              .update({
+                status: "rejected",
+                handledBy: adminEmail,
+                handledAt: Date.now(),
+              })
+              .catch((err) => {
+                console.error(err);
+                alert("Failed to reject request.");
+              });
+          }
+        });
+      });
+
+      // Ripple
+      document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".ripple");
+        if (!btn) return;
+
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        const circle = document.createElement("span");
+        circle.style.width = circle.style.height = size + "px";
+        circle.style.left = x + "px";
+        circle.style.top = y + "px";
+        circle.style.position = "absolute";
+        circle.style.borderRadius = "9999px";
+        circle.style.background = "rgba(255,255,255,0.25)";
+        circle.style.transform = "scale(0)";
+        circle.style.opacity = "1";
+        circle.style.transition =
+          "transform 0.4s ease-out, opacity 0.4s ease-out";
+
+        btn.style.position = "relative";
+        btn.style.overflow = "hidden";
+        btn.appendChild(circle);
+
+        requestAnimationFrame(() => {
+          circle.style.transform = "scale(2.5)";
+          circle.style.opacity = "0";
+        });
+
+        setTimeout(() => circle.remove(), 450);
+      });
+
+      // Logo fallback
+      const logoImg = document.querySelector('img[alt="Logo"]');
+      const logoFallback = document.getElementById("logo-fallback");
+      if (logoImg) {
+        logoImg.addEventListener("load", () => {
+          if (logoImg.naturalWidth > 0 && logoFallback) {
+            logoFallback.style.display = "none";
+          }
+        });
+      }
+
+      // Start listening for requests
+      function subscribeRequestsWrapper() {
+        subscribeRequests();
+      }
+      subscribeRequestsWrapper();
+    </script>
+  </body>
+</html>

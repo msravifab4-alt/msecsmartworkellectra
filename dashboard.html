@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MSEC Smart Workspace – Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind custom config -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Poppins", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", system-ui, sans-serif;
+        background: linear-gradient(135deg, #4e4376, #2b5876);
+        color: #fff;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+      }
+
+      .glass-card {
+        width: 100%;
+        max-width: 480px;
+        background: rgba(15, 23, 42, 0.95);
+        border-radius: 26px;
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        padding: 14px 14px 16px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 6px;
+      }
+
+      header img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #fff;
+        padding: 4px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+      }
+
+      header h1 {
+        font-size: 1.2rem;
+        margin: 6px 0 2px;
+      }
+
+      header p {
+        margin: 0;
+        font-size: 0.65rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #9ca3af;
+      }
+
+      #user-email {
+        font-size: 0.7rem;
+        color: #e5e7eb;
+        margin-top: 4px;
+      }
+
+      .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0 6px;
+        flex-wrap: wrap;
+        font-size: 0.7rem;
+      }
+
+      .perm-chip {
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .perm-granted {
+        background: rgba(16, 185, 129, 0.15);
+        color: #6ee7b7;
+        border: 1px solid rgba(16, 185, 129, 0.7);
+      }
+
+      .perm-pending {
+        background: rgba(245, 158, 11, 0.15);
+        color: #facc15;
+        border: 1px solid rgba(245, 158, 11, 0.7);
+      }
+
+      .perm-none {
+        background: rgba(248, 113, 113, 0.15);
+        color: #fecaca;
+        border: 1px solid rgba(248, 113, 113, 0.7);
+      }
+
+      button {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: none;
+        background: #fff;
+        color: #4e4376;
+        font-weight: 600;
+        font-size: 0.7rem;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      button.secondary {
+        background: transparent;
+        color: #e5e7eb;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(15, 23, 42, 0.45);
+      }
+
+      .info-line {
+        font-size: 0.65rem;
+        color: #9ca3af;
+        margin-bottom: 8px;
+      }
+
+      #inline-alert {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.9);
+        border-radius: 12px;
+        padding: 7px 9px;
+        margin-bottom: 6px;
+        border-left: 3px solid #facc15;
+        font-size: 0.7rem;
+        display: none;
+      }
+
+      /* Department big boxes */
+      #deptGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .dept-card {
+        border-radius: 18px;
+        padding: 10px 10px;
+        background: linear-gradient(
+          135deg,
+          rgba(56, 189, 248, 0.15),
+          rgba(15, 23, 42, 0.95)
+        );
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+        cursor: pointer;
+        transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+      }
+
+      .dept-card.active {
+        border-color: #38bdf8;
+        box-shadow: 0 6px 18px rgba(56, 189, 248, 0.35);
+        transform: translateY(-2px);
+      }
+
+      .dept-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #e5e7eb;
+      }
+
+      .dept-sub {
+        font-size: 0.65rem;
+        color: #9ca3af;
+      }
+
+      .dept-pill {
+        display: inline-block;
+        margin-top: 4px;
+        font-size: 0.6rem;
+        padding: 2px 7px;
+        border-radius: 999px;
+        color: #38bdf8;
+        background: rgba(56, 189, 248, 0.15);
+        border: 1px solid rgba(56, 189, 248, 0.5);
+      }
+
+      /* Selected department panel */
+      #deptPanel {
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: rgba(15, 23, 42, 0.98);
+        padding: 10px 10px 10px;
+        margin-top: 4px;
+        display: none;
+      }
+
+      #deptTitle {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 4px;
+      }
+
+      #deptSubtitle {
+        font-size: 0.65rem;
+        color: #9ca3af;
+        margin-bottom: 6px;
+      }
+
+      .devices-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+      }
+
+      .device-card {
+        background: rgba(15, 23, 42, 0.96);
+        border-radius: 18px;
+        padding: 8px 8px 9px;
+        text-align: center;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(148, 163, 184, 0.55);
+      }
+
+      .device-card h4 {
+        margin: 3px 0 2px;
+        font-size: 0.8rem;
+        color: #e5e7eb;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .device-card span.sub {
+        display: block;
+        font-size: 0.6rem;
+        color: #9ca3af;
+      }
+
+      .btn-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 6px;
+        margin-bottom: 4px;
+      }
+
+      .push-btn {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: none;
+        font-weight: 700;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.22s;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      }
+
+      .push-btn.on-btn {
+        background: #22c55e;
+        color: #022c22;
+      }
+
+      .push-btn.off-btn {
+        background: #e74c3c;
+        color: #fff;
+      }
+
+      .push-btn.view-only {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      .device-info-line {
+        font-size: 0.6rem;
+        color: #9ca3af;
+      }
+
+      .ripple {
+        position: relative;
+        overflow: hidden;
+      }
+      .ripple::after {
+        content: "";
+        position: absolute;
+        border-radius: 9999px;
+        transform: scale(0);
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="glass-card">
+      <header>
+        <img
+          src="https://res.cloudinary.com/dij2lqcim/image/upload/v1763748167/download_1_ren5k5.png"
+          alt="MSEC Logo"
+          onerror="this.style.display='none'"
+        />
+        <h1>MSEC Smart Workspace</h1>
+        <p>USER DASHBOARD · ELLECTRA</p>
+        <div id="user-email">Checking login...</div>
+      </header>
+
+      <div id="inline-alert"></div>
+
+      <div class="top-bar">
+        <div id="perm-chip" class="perm-chip perm-none">
+          <span>Access: View Only</span>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button id="remoteBtn" class="ripple">
+            Remote Access
+          </button>
+          <button id="requestAccessBtn" class="ripple">
+            Get Permission
+          </button>
+          <button id="logoutBtn" class="secondary ripple">Logout</button>
+        </div>
+      </div>
+
+      <div class="info-line">
+        1) Select a department card. 2) Tap appliance button to toggle:
+        first tap → ON, next tap → OFF. (Button label is inverted as requested)
+      </div>
+
+      <!-- Department cards -->
+      <div id="deptGrid"></div>
+
+      <!-- Selected department devices -->
+      <div id="deptPanel">
+        <div id="deptTitle"></div>
+        <div id="deptSubtitle"></div>
+        <div id="devicesContainer" class="devices-grid"></div>
+      </div>
+    </div>
+
+    <!-- MQTT client -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+    <!-- Firebase SDKs (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.5/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.5/firebase-database-compat.js"></script>
+
+    <script>
+      // ----------------- Firebase Config (MSEC) -----------------
+      const firebaseConfig = {
+        apiKey: "AIzaSyAhOJaqUqGNm02GrNUNzOiBVIz7Q0UB4y4",
+        authDomain: "msecsmartworkspaceellectra.firebaseapp.com",
+        databaseURL:
+          "https://msecsmartworkspaceellectra-default-rtdb.firebaseio.com",
+        projectId: "msecsmartworkspaceellectra",
+        storageBucket: "msecsmartworkspaceellectra.firebasestorage.app",
+        messagingSenderId: "959144311304",
+        appId: "1:959144311304:web:a9cd738daa8a800d2e2fbd",
+        measurementId: "G-F5E8N7084S",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.database();
+
+      const userEmailSpan = document.getElementById("user-email");
+      const inlineAlert = document.getElementById("inline-alert");
+      const permChip = document.getElementById("perm-chip");
+
+      const deptGrid = document.getElementById("deptGrid");
+      const deptPanel = document.getElementById("deptPanel");
+      const deptTitle = document.getElementById("deptTitle");
+      const deptSubtitle = document.getElementById("deptSubtitle");
+      const devicesContainer = document.getElementById("devicesContainer");
+
+      let currentUser = null;
+      let canControl = false;
+      // deptDevicesMap[DEPT] = { devices:[{...}], rooms:{}, nextRelay:n }
+      let deptDevicesMap = {};
+      let selectedDept = null;
+      let mqttClient = null;
+
+      function showInlineAlert(msg, color = "#facc15") {
+        inlineAlert.textContent = msg;
+        inlineAlert.style.display = "block";
+        inlineAlert.style.borderLeftColor = color;
+      }
+
+      function setPermChipState(state) {
+        permChip.classList.remove("perm-granted", "perm-pending", "perm-none");
+        if (state === "granted") {
+          permChip.classList.add("perm-granted");
+          permChip.innerHTML = "<span>Access: Control Enabled</span>";
+        } else if (state === "pending") {
+          permChip.classList.add("perm-pending");
+          permChip.innerHTML = "<span>Access: Pending</span>";
+        } else {
+          permChip.classList.add("perm-none");
+          permChip.innerHTML = "<span>Access: View Only</span>";
+        }
+      }
+
+      // ----------------- Auth -----------------
+      auth.onAuthStateChanged((user) => {
+        if (!user) {
+          window.location.href = "index.html";
+          return;
+        }
+        currentUser = user;
+        userEmailSpan.textContent = user.email || "Unknown user";
+
+        watchPermission(user.uid);
+        watchPendingRequests(user.uid);
+        subscribeRoomsAndDevices();
+        initMqttFromConfig();
+      });
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        auth.signOut().then(() => {
+          if (mqttClient) {
+            try {
+              mqttClient.end(true);
+            } catch (e) {}
+          }
+          window.location.href = "index.html";
+        });
+      });
+
+      // Remote access button → remote.html
+      document.getElementById("remoteBtn").addEventListener("click", () => {
+        window.location.href = "remote.html";
+      });
+
+      // ----------------- Permission & Requests -----------------
+      function watchPermission(uid) {
+        db.ref("userPermissions/" + uid).on("value", (snap) => {
+          if (snap.exists() && snap.val().canControl) {
+            canControl = true;
+            setPermChipState("granted");
+          } else {
+            canControl = false;
+          }
+          updateDeviceButtonsView();
+        });
+      }
+
+      function watchPendingRequests(uid) {
+        db.ref("controlRequests").on("value", (snap) => {
+          let hasPending = false;
+          snap.forEach((child) => {
+            const v = child.val();
+            if (v.uid === uid && v.status === "pending") {
+              hasPending = true;
+            }
+          });
+          if (hasPending) {
+            setPermChipState("pending");
+          } else {
+            setPermChipState(canControl ? "granted" : "none");
+          }
+        });
+      }
+
+      document
+        .getElementById("requestAccessBtn")
+        .addEventListener("click", () => {
+          if (!currentUser) {
+            showInlineAlert("Please login again.", "#f87171");
+            return;
+          }
+          const reqRef = db.ref("controlRequests").push();
+          reqRef
+            .set({
+              uid: currentUser.uid,
+              email: currentUser.email || "",
+              displayName: currentUser.displayName || "",
+              createdAt: Date.now(),
+              status: "pending",
+            })
+            .then(() => {
+              showInlineAlert("Permission request sent to admin.", "#4ade80");
+              setPermChipState("pending");
+            })
+            .catch((err) => {
+              console.error(err);
+              showInlineAlert("Failed to send request.", "#f87171");
+            });
+        });
+
+      // ----------------- Rooms + Devices from Firebase -----------------
+      function subscribeRoomsAndDevices() {
+        db.ref("rooms").on("value", (snap) => {
+          deptDevicesMap = {};
+          if (!snap.exists()) {
+            deptGrid.innerHTML = "";
+            deptPanel.style.display = "none";
+            return;
+          }
+
+          snap.forEach((roomSnap) => {
+            const roomId = roomSnap.key;
+            const room = roomSnap.val();
+            const dept = (room.dept || "OTHER").toUpperCase();
+            const roomName = room.name || "";
+
+            if (!deptDevicesMap[dept]) {
+              deptDevicesMap[dept] = {
+                devices: [],
+                rooms: {},
+                nextRelay: 1,
+              };
+            }
+
+            deptDevicesMap[dept].rooms[roomId] = roomName;
+
+            if (room.devices) {
+              Object.entries(room.devices).forEach(([devId, dev]) => {
+                const info = deptDevicesMap[dept];
+
+                // Map only first 6 devices per dept to relays 1..6
+                const relayIndex = info.nextRelay;
+                if (relayIndex <= 6) {
+                  info.devices.push({
+                    deviceId: devId,
+                    roomId,
+                    roomName,
+                    dept,
+                    name: dev.name || "Device",
+                    type: dev.type || "",
+                    controlTopic:
+                      dev.controlTopic ||
+                      `msec/${dept.toLowerCase()}/relay/control`,
+                    statusTopic:
+                      dev.statusTopic ||
+                      `msec/${dept.toLowerCase()}/relay/status`,
+                    relayIndex: relayIndex, // 1..6
+                    lastState: "OFF", // runtime state from MQTT status
+                  });
+                  info.nextRelay++;
+                } else {
+                  // more than 6 devices: show only, no relay mapping
+                  info.devices.push({
+                    deviceId: devId,
+                    roomId,
+                    roomName,
+                    dept,
+                    name: dev.name || "Device",
+                    type: dev.type || "",
+                    controlTopic:
+                      dev.controlTopic ||
+                      `msec/${dept.toLowerCase()}/relay/control`,
+                    statusTopic:
+                      dev.statusTopic ||
+                      `msec/${dept.toLowerCase()}/relay/status`,
+                    relayIndex: null,
+                    lastState: "OFF",
+                  });
+                }
+              });
+            }
+          });
+
+          renderDeptCards();
+          if (!selectedDept) {
+            const allDepts = Object.keys(deptDevicesMap);
+            if (allDepts.length > 0) {
+              selectedDept = allDepts[0];
+            }
+          } else if (!deptDevicesMap[selectedDept]) {
+            const allDepts = Object.keys(deptDevicesMap);
+            selectedDept = allDepts[0] || null;
+          }
+          renderSelectedDept();
+        });
+      }
+
+      function renderDeptCards() {
+        deptGrid.innerHTML = "";
+
+        const depts = Object.keys(deptDevicesMap).sort();
+        if (depts.length === 0) {
+          deptGrid.innerHTML =
+            '<p style="font-size:0.7rem;color:#e5e7eb;">No departments configured. Please contact admin.</p>';
+          return;
+        }
+
+        depts.forEach((dept) => {
+          const info = deptDevicesMap[dept];
+          const roomsCount = Object.keys(info.rooms).length;
+          const devCount = info.devices.length;
+
+          const card = document.createElement("div");
+          card.className =
+            "dept-card ripple" + (dept === selectedDept ? " active" : "");
+          card.dataset.dept = dept;
+
+          card.innerHTML = `
+            <div class="dept-name">${dept} Department</div>
+            <div class="dept-sub">Rooms: ${roomsCount} · Devices: ${devCount}</div>
+            <div class="dept-pill">Tap to view appliances</div>
+          `;
+
+          deptGrid.appendChild(card);
+        });
+      }
+
+      function renderSelectedDept() {
+        if (!selectedDept || !deptDevicesMap[selectedDept]) {
+          deptPanel.style.display = "none";
+          return;
+        }
+
+        const info = deptDevicesMap[selectedDept];
+        const roomsCount = Object.keys(info.rooms).length;
+        const devCount = info.devices.length;
+
+        deptTitle.textContent = `${selectedDept} – Appliances`;
+        deptSubtitle.textContent = `Rooms: ${roomsCount} · Devices: ${devCount}`;
+
+        devicesContainer.innerHTML = "";
+
+        if (devCount === 0) {
+          devicesContainer.innerHTML =
+            '<p style="font-size:0.7rem;color:#e5e7eb;">No devices added yet for this department.</p>';
+        } else {
+          info.devices.forEach((dev) => {
+            const card = document.createElement("div");
+            card.className = "device-card";
+            card.dataset.roomId = dev.roomId;
+            card.dataset.deviceId = dev.deviceId;
+            card.dataset.dept = dev.dept;
+            card.dataset.relayIndex = dev.relayIndex || "";
+
+            const btnRow = document.createElement("div");
+            btnRow.className = "btn-row";
+
+            // Single toggle button
+            // Logical state = dev.lastState (ON/OFF), but VISUAL is inverted
+            const logicalState = dev.lastState || "OFF";
+            const visualState = logicalState === "ON" ? "OFF" : "ON";
+
+            const btn = document.createElement("button");
+            btn.className =
+              "push-btn ripple " +
+              (visualState === "ON" ? "on-btn" : "off-btn");
+            btn.textContent = visualState;
+            btn.dataset.state = logicalState; // logical state used for MQTT
+
+            btnRow.appendChild(btn);
+            card.appendChild(btnRow);
+
+            const nameEl = document.createElement("h4");
+            nameEl.textContent = dev.name;
+            card.appendChild(nameEl);
+
+            const sub = document.createElement("span");
+            sub.className = "sub";
+            sub.textContent = dev.roomName || selectedDept + " Room";
+            card.appendChild(sub);
+
+            const infoLine = document.createElement("div");
+            infoLine.className = "device-info-line";
+            if (!dev.relayIndex) {
+              infoLine.textContent =
+                (dev.type ? dev.type + " · " : "") +
+                "No relay mapped (only first 6 used)";
+            } else {
+              infoLine.textContent =
+                (dev.type ? dev.type + " · " : "") + "Relay R" + dev.relayIndex;
+            }
+            card.appendChild(infoLine);
+
+            devicesContainer.appendChild(card);
+          });
+        }
+
+        deptPanel.style.display = "block";
+        updateDeviceButtonsView();
+      }
+
+      function updateDeviceButtonsView() {
+        const buttons = devicesContainer.querySelectorAll(".push-btn");
+        buttons.forEach((btn) => {
+          if (!canControl) {
+            btn.classList.add("view-only");
+          } else {
+            btn.classList.remove("view-only");
+          }
+        });
+      }
+
+      // ----------------- MQTT Init & Control -----------------
+      function initMqttFromConfig() {
+        db.ref("config/mqtt")
+          .once("value")
+          .then((snap) => {
+            const cfg = snap.val();
+            if (!cfg || !cfg.host || !cfg.wsPort) {
+              console.warn("MQTT config missing");
+              return;
+            }
+            const url = "wss://" + cfg.host + ":" + cfg.wsPort + "/mqtt";
+            const options = {
+              username: cfg.username || "",
+              password: cfg.password || "",
+              reconnectPeriod: 4000,
+              clientId: "msec_web_" + Math.random().toString(16).slice(2),
+            };
+
+            try {
+              mqttClient = mqtt.connect(url, options);
+            } catch (e) {
+              console.error("MQTT connect error", e);
+              return;
+            }
+
+            mqttClient.on("connect", () => {
+              console.log("MQTT connected");
+              showInlineAlert("Connected to IoT broker.", "#4ade80");
+
+              // Subscribe to ALL department status topics: msec/eee/relay/status, msec/ece/relay/status, ...
+              mqttClient.subscribe("msec/+/relay/status", (err) => {
+                if (err) {
+                  console.error("Subscribe error:", err);
+                } else {
+                  console.log("Subscribed to msec/+/relay/status");
+                }
+              });
+            });
+
+            mqttClient.on("reconnect", () => {
+              console.log("MQTT reconnecting...");
+            });
+
+            mqttClient.on("error", (err) => {
+              console.error("MQTT error:", err);
+              showInlineAlert("MQTT error (see console).", "#f87171");
+            });
+
+            mqttClient.on("close", () => {
+              console.log("MQTT disconnected");
+            });
+
+            // Handle incoming STATUS messages: R1=ON, R2=OFF, etc.
+            mqttClient.on("message", (topic, payload) => {
+              try {
+                const msg = payload.toString();
+                console.log("MQTT status msg:", topic, msg);
+
+                const parts = topic.split("/");
+                // topic format: msec/<dept>/relay/status
+                if (parts.length < 4) return;
+                const deptSlug = (parts[1] || "").toUpperCase(); // EEE, ECE, ...
+
+                const match = msg.match(/^R([1-6])=(ON|OFF)$/i);
+                if (!match) return;
+
+                const relayIndex = parseInt(match[1], 10); // 1..6
+                const state = match[2].toUpperCase(); // ON or OFF
+
+                const info = deptDevicesMap[deptSlug];
+                if (!info) return;
+
+                // Update dev object state in memory
+                const dev = info.devices.find(
+                  (d) => d.relayIndex === relayIndex
+                );
+                if (!dev) return;
+                dev.lastState = state;
+
+                // If this department is currently visible, update its button
+                if (selectedDept === deptSlug) {
+                  const cards =
+                    devicesContainer.querySelectorAll(".device-card");
+                  cards.forEach((card) => {
+                    const cardRelay = parseInt(
+                      card.dataset.relayIndex || "0",
+                      10
+                    );
+                    if (cardRelay === relayIndex) {
+                      const btn = card.querySelector(".push-btn");
+                      if (!btn) return;
+
+                      btn.dataset.state = state; // logical
+
+                      // visual is inverted
+                      const visualState = state === "ON" ? "OFF" : "ON";
+
+                      btn.textContent = visualState;
+                      btn.classList.remove("on-btn", "off-btn");
+                      btn.classList.add(
+                        visualState === "ON" ? "on-btn" : "off-btn"
+                      );
+                    }
+                  });
+                }
+              } catch (e) {
+                console.error("Error handling MQTT message:", e);
+              }
+            });
+          })
+          .catch((err) => {
+            console.error("Failed to load MQTT config:", err);
+          });
+      }
+
+      function sendDeviceCommand(roomId, deviceId, dept, relayIndex, action) {
+        const info = deptDevicesMap[dept];
+        if (!info) return;
+
+        if (!relayIndex || relayIndex < 1 || relayIndex > 6) {
+          showInlineAlert(
+            "This device is not mapped to a relay (only first 6 used).",
+            "#f97316"
+          );
+          return;
+        }
+
+        if (!canControl) {
+          showInlineAlert(
+            "Control not allowed. Please request permission from admin.",
+            "#f97316"
+          );
+          return;
+        }
+
+        if (!mqttClient || mqttClient.disconnected) {
+          showInlineAlert("MQTT not connected.", "#f87171");
+          return;
+        }
+
+        const dev = info.devices.find(
+          (d) => d.roomId === roomId && d.deviceId === deviceId
+        );
+        if (!dev) return;
+
+        const payload = "R" + relayIndex + action; // e.g. R1ON, R2OFF
+        console.log("Publishing:", dev.controlTopic, payload);
+
+        try {
+          mqttClient.publish(dev.controlTopic, payload);
+        } catch (e) {
+          console.error("MQTT publish error:", e);
+          showInlineAlert("Failed to send control command.", "#f87171");
+          return;
+        }
+      }
+
+      // ----------------- Events -----------------
+      // Department card click
+      deptGrid.addEventListener("click", (e) => {
+        const card = e.target.closest(".dept-card");
+        if (!card) return;
+        const dept = card.dataset.dept;
+        if (!dept || !deptDevicesMap[dept]) return;
+
+        selectedDept = dept;
+        document
+          .querySelectorAll(".dept-card")
+          .forEach((c) => c.classList.remove("active"));
+        card.classList.add("active");
+
+        renderSelectedDept();
+      });
+
+      // Device single toggle button click: logical ON <-> OFF,
+      // but VISUAL is shown inverted.
+      devicesContainer.addEventListener("click", (e) => {
+        const btn = e.target.closest(".push-btn");
+        if (!btn) return;
+        const card = btn.closest(".device-card");
+        if (!card) return;
+
+        const roomId = card.dataset.roomId;
+        const deviceId = card.dataset.deviceId;
+        const dept = card.dataset.dept;
+        const relayIndex = parseInt(card.dataset.relayIndex || "0", 10);
+
+        let currentState = btn.dataset.state || "OFF"; // logical
+        const newState = currentState === "ON" ? "OFF" : "ON"; // logical toggle
+
+        // Send MQTT command with logical state
+        sendDeviceCommand(roomId, deviceId, dept, relayIndex, newState);
+
+        // Update local dev.lastState so UI is instant (live MQTT will also refresh)
+        const info = deptDevicesMap[dept];
+        if (info) {
+          const dev = info.devices.find(
+            (d) => d.roomId === roomId && d.deviceId === deviceId
+          );
+          if (dev) dev.lastState = newState;
+        }
+
+        // Update button UI (inverted display)
+        if (canControl) {
+          btn.dataset.state = newState;
+
+          const visualState = newState === "ON" ? "OFF" : "ON";
+
+          btn.textContent = visualState;
+          btn.classList.remove("on-btn", "off-btn");
+          btn.classList.add(
+            visualState === "ON" ? "on-btn" : "off-btn"
+          );
+        }
+      });
+
+      // Ripple effect
+      document.addEventListener("click", (e) => {
+        const btn = e.target.closest(".ripple");
+        if (!btn) return;
+
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        const circle = document.createElement("span");
+        circle.style.width = circle.style.height = size + "px";
+        circle.style.left = x + "px";
+        circle.style.top = y + "px";
+        circle.style.position = "absolute";
+        circle.style.borderRadius = "9999px";
+        circle.style.background = "rgba(255,255,255,0.25)";
+        circle.style.transform = "scale(0)";
+        circle.style.opacity = "1";
+        circle.style.transition =
+          "transform 0.3s ease-out, opacity 0.3s ease-out";
+
+        btn.style.position = "relative";
+        btn.style.overflow = "hidden";
+        btn.appendChild(circle);
+
+        requestAnimationFrame(() => {
+          circle.style.transform = "scale(2.5)";
+          circle.style.opacity = "0";
+        });
+
+        setTimeout(() => circle.remove(), 350);
+      });
+    </script>
+  </body>
+</html>
