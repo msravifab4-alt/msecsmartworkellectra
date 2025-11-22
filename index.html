@@ -169,32 +169,31 @@
       // Google Sign-in + redirect logic
       // isAdminLogin = true when "Admin" button is used
       function handleGoogleLogin(isAdminLogin) {
-        auth
-          .signInWithPopup(provider)
-          .then((result) => {
-            const user = result.user;
-            const email = (user.email || "").toLowerCase();
+  const provider = new firebase.auth.GoogleAuthProvider();
 
-            if (isAdminLogin) {
-              // Admin button clicked
-              if (ADMIN_EMAILS.includes(email)) {
-                // Admin email -> admin dashboard
-                window.location.href = "https://msravifab4-alt.github.io/msecsmartworkellectra/admindashboard.html";
-              } else {
-                // Not admin -> show error, stay here (or send to dashboard if you want)
-                alert("You are not authorized as admin. Please use normal Login.");
-              }
-            } else {
-              // Normal Login button clicked
-              // Everyone (including admins) goes to normal dashboard
-              window.location.href = "https://msravifab4-alt.github.io/msecsmartworkellectra/dashboard.html";
-            }
-          })
-          .catch((error) => {
-            console.error("Login error:", error);
-            alert("Login failed: " + error.message);
-          });
+  firebase.auth()
+    .signInWithPopup(provider)
+    .then((result) => {
+      const user = result.user;
+      const email = (user.email || "").toLowerCase();
+
+      if (isAdminLogin) {
+        if (ADMIN_EMAILS.includes(email)) {
+          window.location.href =
+            "https://msravifab4-alt.github.io/msecsmartworkellectra/admindashboard.html";
+        } else {
+          alert("You are not authorized as admin. Please use normal Login.");
+        }
+      } else {
+        window.location.href =
+          "https://msravifab4-alt.github.io/msecsmartworkellectra/dashboard.html";
       }
+    })
+    .catch((error) => {
+      console.error("Login error:", error);
+      alert("Login failed: " + error.message);
+    });
+}
 
       // --------------------------
       // UI: Logo handling
@@ -254,4 +253,5 @@
     </script>
   </body>
 </html>
+
 
